@@ -39,26 +39,19 @@ def cd_color_segmentation(img, template):
 	########## YOUR CODE STARTS HERE ##########
 	# Convert the image to HSV
 	hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	#use cv2.inRange to apply a mask to the image
-	color_mask = cv2.inRange(hsv_img, lower_orange, high_orange)
-	img_masked = cv2.bitwise_and(hsv_img,hsv_img, mask=color_mask)
-	
-	bgr_img_masked = cv2.cvtColor(img_masked, cv2.COLOR_HSV2BGR)
 
+	#use cv2.inRange to apply a mask to the image
+	masked = cv2.inRange(hsv_img, lower_orange, high_orange)
+	masked = cv2.erode(masked, np.ones((5,5)), iterations = 1)
+	masked = cv2.dilate(masked, np.ones((5,5)), iterations = 1)
+	
 	# Apply thresholding to the masked image
-	_, thresholded_image = cv2.threshold(bgr_img_masked, 40, 255, cv2.THRESH_BINARY)
+	_, thresholded_image = cv2.threshold(masked, 40, 255, cv2.THRESH_BINARY)
 	contours, _  = cv2.findContours(thresholded_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 	if len(contours) > 0:
-                best_contour = max(contours, key=cv2.contourArea) # Choose contour of largest area
-                if cv2.contourArea(best_contour) >= MIN_CONTOUR_AREA: # Super small contour --> likely just noise
-                    # Build Bounding Box
-                    x,y,w,h = cv2.boundingRect(best_contour)
-                    bounding_box = ((x,y), (x+w, y+h))
-                    return bounding_box
-    
-
-
-	########### YOUR CODE ENDS HERE ###########
-
-	# Return bounding box
+		best_contour = max(contours, key=cv2.contourArea) # Choose contour of largest area
+		if cv2.contourArea(best_contour) >= MIN_CONTOUR_AREA: 
+			x,y,w,h = cv2.boundingRect(best_contour)
+			bounding_box = ((x,y), (x+w, y+h))
+			return bounding_box
