@@ -50,7 +50,10 @@ class ConeDetector(Node):
         bounding_box = cd_color_segmentation(image_msg, None)
         middle_x = (bounding_box[0][0] + bounding_box[1][0])/2
         lower_y = bounding_box[1][1]
-        self.cone_pub.publish((middle_x, lower_y))
+        cone_msg = ConeLocationPixel()
+        cone_msg.u = middle_x
+        cone_msg.v = lower_y
+        self.cone_pub.publish(cone_msg)
 
         image = self.bridge.imgmsg_to_cv2(image_msg, "bgr8")
 
