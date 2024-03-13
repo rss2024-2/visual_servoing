@@ -66,11 +66,14 @@ def cd_sift_ransac(img, template):
 		h, w = template.shape
 		pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
 
-		########## YOUR CODE STARTS HERE ##########
+		# Transform the points using the homography matrix
+		transformed_pts = cv2.perspectiveTransform(pts, M)
 
-		x_min = y_min = x_max = y_max = 0
-
-		########### YOUR CODE ENDS HERE ###########
+		# Calculate the bounding box coordinates
+		x_min = np.min(transformed_pts[:, :, 0])
+		y_min = np.min(transformed_pts[:, :, 1])
+		x_max = np.max(transformed_pts[:, :, 0])
+		y_max = np.max(transformed_pts[:, :, 1])
 
 		# Return bounding box
 		return ((x_min, y_min), (x_max, y_max))
