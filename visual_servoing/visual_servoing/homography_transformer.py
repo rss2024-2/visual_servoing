@@ -20,7 +20,7 @@ from vs_msgs.msg import ConeLocation, ConeLocationPixel
 # see README.md for coordinate frame description
 
 ######################################################
-## DUMMY POINTS -- ENTER YOUR MEASUREMENTS HERE
+######################################################
 ## DUMMY POINTS -- ENTER YOUR MEASUREMENTS HERE
 PTS_IMAGE_PLANE = [[332, 303],
                    [123, 338],
@@ -43,7 +43,6 @@ PTS_GROUND_PLANE = [[16, -0.25],
                     [15.5, -2.2],
                     [26.0, 6.5],
                     [20.25, -9.0]] # dummy points
-######################################################
 ######################################################
 
 METERS_PER_INCH = 0.0254
@@ -81,6 +80,7 @@ class HomographyTransformer(Node):
 
         #Call to main function
         x, y = self.transformUvToXy(u, v)
+        
 
         #Publish relative xy position of object in real world
         relative_xy_msg = ConeLocation()
@@ -109,6 +109,9 @@ class HomographyTransformer(Node):
         homogeneous_xy = xy * scaling_factor
         x = homogeneous_xy[0, 0]
         y = homogeneous_xy[1, 0]
+
+        self.draw_marker(x, y, "/map")
+
         return x, y
 
     def draw_marker(self, cone_x, cone_y, message_frame):
@@ -130,6 +133,8 @@ class HomographyTransformer(Node):
         marker.pose.position.x = cone_x
         marker.pose.position.y = cone_y
         self.marker_pub.publish(marker)
+
+
 
 def main(args=None):
     rclpy.init(args=args)

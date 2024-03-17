@@ -41,7 +41,7 @@ class ParkingController(Node):
         self.max_angle_error=np.pi/30
 
         self.hysteris_lb=self.parking_distance
-        self.hysteris_ub=2*self.parking_distance
+        self.hysteris_ub=1.5 * self.parking_distance
         self.dir=-1
 
     def relative_cone_callback(self, msg):

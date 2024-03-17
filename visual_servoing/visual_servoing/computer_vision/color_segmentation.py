@@ -13,8 +13,8 @@ import numpy as np
 #  v
 ###############################################################
 
-lower_orange = np.array([1, 190, 60])
-high_orange = np.array([23, 255, 255])
+lower_orange = np.array([4, 190, 60])
+high_orange = np.array([15, 255, 255])
 MIN_CONTOUR_AREA = 200
 
 def image_print(img):
