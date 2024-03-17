@@ -112,6 +112,9 @@ def cd_template_matching(img, template):
 
 	# Keep track of best-fit match
 	best_match = None
+	best_scale = None
+	max_score = -float('inf')  # Initialize max_score to negative infinity
+
 
 	# Loop over different scales of image
 	for scale in np.linspace(1.5, .5, 50):
@@ -128,7 +131,37 @@ def cd_template_matching(img, template):
 
 		# Remember to resize the bounding box using the highest scoring scale
 		# x1,y1 pixel will be accurate, but x2,y2 needs to be correctly scaled
-		bounding_box = ((0,0),(0,0))
+
+		result = cv2.matchTemplate(img_canny, resized_template, cv2.TM_CCOEFF_NORMED)
+		_, max_val, _, max_loc = cv2.minMaxLoc(result)
+		if max_val > max_score:
+			best_match = result
+			best_scale = scale
+			max_score = max_val
+
+		# # Find the location of the best match
+		# min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+		# top_left = max_loc
+		# bottom_left = (top_left[0], top_left[1]+h)
+		# top_right = (top_left[0] + w, top_left[1])
+		# bottom_right = (top_left[0]+w, top_left[1]+h)
+
+		# img_bb = img.copy()
+
+		# bounding_box = (top_left,_right)
+		# cv2.rectangle(img_bb,top_left, bottom_right, 255, 2)
+		# print(bounding_box)
+		# image_print(img_bb)
 		########### YOUR CODE ENDS HERE ###########
 
+	(h, w) = template_canny.shape[:2]
+	top_left = max_loc
+	bottom_right = (int(top_left[0] + w * best_scale), int(top_left[1] + h * best_scale))
+	
+	bounding_box = (top_left, bottom_right)
+	img_bb = img.copy()
+	cv2.rectangle(img_bb,top_left, bottom_right, 255, 2)
+	image_print(img_bb)
+	
 	return bounding_box
