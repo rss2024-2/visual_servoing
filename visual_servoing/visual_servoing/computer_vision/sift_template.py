@@ -19,12 +19,13 @@ def image_print(img):
 	Helper function to print out images, for debugging.
 	Press any key to continue.
 	"""
-	winname = "Image"
-	cv2.namedWindow(winname)        # Create a named window
-	cv2.moveWindow(winname, 40,30)  # Move it to (40,30)
-	cv2.imshow(winname, img)
-	cv2.waitKey()
-	cv2.destroyAllWindows()
+	winname = "Image.jpg"
+	# cv2.namedWindow(winname)        # Create a named window
+	# cv2.moveWindow(winname, 40,30)  # Move it to (40,30)
+	#cv2.imshow(winname, img)
+	cv2.imwrite(winname, img)
+	#cv2.waitKey()
+	# cv2.destroyAllWindows()
 
 def cd_sift_ransac(img, template):
 	"""
@@ -36,7 +37,8 @@ def cd_sift_ransac(img, template):
 				(x1, y1) is the bottom left of the bbox and (x2, y2) is the top right of the bbox
 	"""
 	# Minimum number of matching features
-	MIN_MATCH = 10 # Adjust this value as needed
+	image_print(template)
+	MIN_MATCH = 8 # Adjust this value as needed
 	# Create SIFT
 	sift = cv2.xfeatures2d.SIFT_create()
 
@@ -59,21 +61,27 @@ def cd_sift_ransac(img, template):
 		src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
 		dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 
+	
+	
 		# Create mask
 		M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
 		matchesMask = mask.ravel().tolist()
+
+	
 
 		h, w = template.shape
 		pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
 
 		# Transform the points using the homography matrix
 		transformed_pts = cv2.perspectiveTransform(pts, M)
+		
+		print(transformed_pts.shape)
 
 		# Calculate the bounding box coordinates
-		x_min = np.min(transformed_pts[:, :, 0])
-		y_min = np.min(transformed_pts[:, :, 1])
-		x_max = np.max(transformed_pts[:, :, 0])
-		y_max = np.max(transformed_pts[:, :, 1])
+		x_min = transformed_pts[0][0][0]
+		y_min = transformed_pts[0][0][1]
+		x_max = transformed_pts[2][0][0]
+		y_max = transformed_pts[2][0][1]
 
 		# Return bounding box
 		return ((x_min, y_min), (x_max, y_max))
